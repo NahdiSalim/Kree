@@ -1,0 +1,9 @@
+export { default as Footer } from "./footer";
+export { default as Hero } from "./hero";
+export { default as LatestListings } from "./latest-listings";
+export { default as Navbar } from "./navbar";
+export { default as Reviews } from "./reviews";
+export { default as SearchBar } from "./search-bar";
+export { default as VideoSection } from "./video-section";
+export { default as WeekendOffers } from "./weekend-offers";
+export { default as WhyUs } from "./why-us";

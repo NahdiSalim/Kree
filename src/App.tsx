@@ -5,6 +5,7 @@ import FormElementsPage from "@/pages/main/forms/form-elements";
 import { BlankPage, Error404Page } from "@/pages/main/pages";
 import ProfilePage from "@/pages/main/profile";
 import BasicTablesPage from "@/pages/main/tables/basic-tables";
+import HomePage from "@/pages/marketing/home";
 import { AuthLayout, SignInPage, SignUpPage } from "@/pages/others/auth";
 import BarChartPage from "@/pages/others/charts/bar-chart";
 import LineChartPage from "@/pages/others/charts/line-chart";
@@ -20,9 +21,12 @@ import { Route, Routes } from "react-router";
 export default function App() {
   return (
     <Routes>
+      {/* Marketing / public site */}
+      <Route index element={<HomePage />} />
+
       {/* Dashboard Layout */}
       <Route element={<AppLayout />}>
-        <Route index element={<EcommercePage />} />
+        <Route path="/dashboard" element={<EcommercePage />} />
 
         {/* Others Page */}
         <Route path="/profile" element={<ProfilePage />} />
