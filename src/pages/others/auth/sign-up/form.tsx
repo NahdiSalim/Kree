@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -9,14 +8,18 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
+import { ApiError } from "@/lib/api";
+import { signupOwner } from "@/lib/owner-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router";
 import { signUpSchema, type SignUpFormData } from "./schema";
 
 export default function SignUpFormFields() {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [formError, setFormError] = useState("");
+  const navigate = useNavigate();
 
   const {
     register,
@@ -26,84 +29,120 @@ export default function SignUpFormFields() {
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      fname: "",
-      lname: "",
+      fullName: "",
       email: "",
+      phone: "",
       password: "",
-      confirmPassword: "",
       terms: false,
     },
     mode: "onTouched",
   });
 
-  const handleFormSubmit = async (_data: SignUpFormData) => {
-    // handle submit action
+  const handleFormSubmit = async (data: SignUpFormData) => {
+    setFormError("");
+    try {
+      await signupOwner({
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone || undefined,
+        password: data.password,
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      setFormError(
+        err instanceof ApiError ? err.message : "Inscription impossible",
+      );
+    }
   };
 
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="space-y-5"
+      className="space-y-4"
       noValidate
     >
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <Field data-invalid={Boolean(errors.fname)}>
-          <FieldLabel className="mb-1.5 block">
-            First Name <span className="text-red-500">*</span>
-          </FieldLabel>
-          <Input
-            {...register("fname")}
-            type="text"
-            placeholder="Enter your first name"
-            aria-invalid={errors.fname ? "true" : undefined}
-          />
-          <FieldError errors={[errors.fname]} />
-        </Field>
-
-        <Field data-invalid={Boolean(errors.lname)}>
-          <FieldLabel className="mb-1.5 block">
-            Last Name <span className="text-red-500">*</span>
-          </FieldLabel>
-          <Input
-            {...register("lname")}
-            type="text"
-            placeholder="Enter your last name"
-            aria-invalid={errors.lname ? "true" : undefined}
-          />
-          <FieldError errors={[errors.lname]} />
-        </Field>
+      <div className="rounded-2xl bg-[var(--kree-blue-soft)] px-4 py-3 ring-1 ring-[var(--kree-blue)]/10">
+        <p className="text-sm font-semibold text-[var(--kree-blue)]">
+          Compte propriétaire uniquement
+        </p>
+        <p className="mt-0.5 text-xs text-[var(--kree-muted)]">
+          Les locataires n’ont pas besoin de compte — ils contactent via WhatsApp
+          ou envoient une demande de réservation.
+        </p>
       </div>
 
+      <Field data-invalid={Boolean(errors.fullName)}>
+        <FieldLabel className="mb-1.5 block text-sm font-semibold text-[var(--kree-ink)]">
+          Nom complet
+        </FieldLabel>
+        <Input
+          {...register("fullName")}
+          type="text"
+          autoComplete="name"
+          placeholder="Amira Ben Salah"
+          aria-invalid={errors.fullName ? "true" : undefined}
+          className="h-12 rounded-2xl border-0 bg-[var(--kree-blue-soft)] px-4 text-[var(--kree-ink)] shadow-none ring-1 ring-[var(--kree-blue)]/10 focus-visible:ring-2 focus-visible:ring-[var(--kree-blue)]/35"
+        />
+        <FieldError errors={[errors.fullName]} />
+      </Field>
+
       <Field data-invalid={Boolean(errors.email)}>
-        <FieldLabel className="mb-1.5 block">
-          Email <span className="text-red-500">*</span>
+        <FieldLabel className="mb-1.5 block text-sm font-semibold text-[var(--kree-ink)]">
+          E-mail
         </FieldLabel>
         <Input
           {...register("email")}
           type="email"
-          placeholder="Enter your email"
+          autoComplete="email"
+          placeholder="vous@exemple.tn"
           aria-invalid={errors.email ? "true" : undefined}
+          className="h-12 rounded-2xl border-0 bg-[var(--kree-blue-soft)] px-4 text-[var(--kree-ink)] shadow-none ring-1 ring-[var(--kree-blue)]/10 focus-visible:ring-2 focus-visible:ring-[var(--kree-blue)]/35"
         />
         <FieldError errors={[errors.email]} />
       </Field>
 
-      <Field data-invalid={Boolean(errors.password)}>
-        <FieldLabel className="mb-1.5 block">
-          Password <span className="text-red-500">*</span>
+      <Field data-invalid={Boolean(errors.phone)}>
+        <FieldLabel className="mb-1.5 block text-sm font-semibold text-[var(--kree-ink)]">
+          WhatsApp{" "}
+          <span className="font-normal text-[var(--kree-muted)]">(recommandé)</span>
         </FieldLabel>
-        <InputGroup>
+        <div className="flex h-12 overflow-hidden rounded-2xl bg-[var(--kree-blue-soft)] ring-1 ring-[var(--kree-blue)]/10 focus-within:ring-2 focus-within:ring-[var(--kree-blue)]/35">
+          <span className="flex items-center border-r border-[var(--kree-blue)]/10 px-3 text-sm font-semibold text-[var(--kree-blue)]">
+            +216
+          </span>
+          <Input
+            {...register("phone")}
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel-national"
+            placeholder="20 123 456"
+            aria-invalid={errors.phone ? "true" : undefined}
+            className="h-full flex-1 rounded-none border-0 bg-transparent px-3 shadow-none focus-visible:ring-0"
+          />
+        </div>
+        <FieldError errors={[errors.phone]} />
+      </Field>
+
+      <Field data-invalid={Boolean(errors.password)}>
+        <FieldLabel className="mb-1.5 block text-sm font-semibold text-[var(--kree-ink)]">
+          Mot de passe
+        </FieldLabel>
+        <InputGroup className="h-12 overflow-hidden rounded-2xl bg-[var(--kree-blue-soft)] ring-1 ring-[var(--kree-blue)]/10 has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-[var(--kree-blue)]/35">
           <InputGroupInput
             {...register("password")}
             type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
+            autoComplete="new-password"
+            placeholder="Au moins 8 caractères"
             aria-invalid={errors.password ? "true" : undefined}
+            className="border-0 bg-transparent shadow-none focus-visible:ring-0"
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton
+              type="button"
               size="icon-xs"
               onClick={() => setShowPassword((prev) => !prev)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-              className="text-gray-500 dark:text-gray-400"
+              aria-label={showPassword ? "Masquer" : "Afficher"}
+              className="text-[var(--kree-muted)]"
             >
               {showPassword ? (
                 <EyeIcon className="text-current" />
@@ -116,43 +155,9 @@ export default function SignUpFormFields() {
         <FieldError errors={[errors.password]} />
       </Field>
 
-      <Field data-invalid={Boolean(errors.confirmPassword)}>
-        <FieldLabel className="mb-1.5 block">
-          Confirm Password <span className="text-red-500">*</span>
-        </FieldLabel>
-        <InputGroup>
-          <InputGroupInput
-            {...register("confirmPassword")}
-            type={showConfirmPassword ? "text" : "password"}
-            placeholder="Re-enter your password"
-            aria-invalid={errors.confirmPassword ? "true" : undefined}
-          />
-          <InputGroupAddon align="inline-end">
-            <InputGroupButton
-              size="icon-xs"
-              onClick={() => setShowConfirmPassword((prev) => !prev)}
-              aria-label={
-                showConfirmPassword
-                  ? "Hide confirm password"
-                  : "Show confirm password"
-              }
-              className="text-gray-500 dark:text-gray-400"
-            >
-              {showConfirmPassword ? (
-                <EyeIcon className="text-current" />
-              ) : (
-                <EyeCloseIcon className="text-current" />
-              )}
-            </InputGroupButton>
-          </InputGroupAddon>
-        </InputGroup>
-        <FieldError errors={[errors.confirmPassword]} />
-      </Field>
-
-      <Field
-        orientation="horizontal"
-        className="items-start gap-3"
-        data-invalid={Boolean(errors.terms)}
+      <div
+        className="flex items-start gap-3"
+        data-invalid={Boolean(errors.terms) || undefined}
       >
         <Controller
           control={control}
@@ -160,41 +165,55 @@ export default function SignUpFormFields() {
           render={({ field }) => (
             <Checkbox
               id="terms"
-              className="mt-0.5"
+              className="mt-1 shrink-0"
               checked={field.value}
               onCheckedChange={(checked) => field.onChange(Boolean(checked))}
               aria-invalid={errors.terms ? "true" : undefined}
             />
           )}
         />
-        <div className="flex flex-col gap-1">
-          <FieldLabel
+        <div className="min-w-0 flex-1">
+          <label
             htmlFor="terms"
-            className="inline-block cursor-pointer text-sm font-normal text-gray-500 dark:text-gray-400"
+            className="block cursor-pointer text-sm leading-relaxed text-[var(--kree-muted)]"
           >
-            By creating an account means you agree to the{" "}
-            <span className="text-gray-800 dark:text-white/90">
-              Terms and Conditions,
-            </span>{" "}
-            and our{" "}
-            <span className="text-gray-800 dark:text-white">
-              Privacy Policy
-            </span>
-          </FieldLabel>
-          <FieldError errors={[errors.terms]} />
+            J&apos;accepte les{" "}
+            <Link
+              to="/contact"
+              className="font-semibold text-[var(--kree-blue)] underline-offset-2 hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              conditions d&apos;utilisation
+            </Link>{" "}
+            et la{" "}
+            <Link
+              to="/contact"
+              className="font-semibold text-[var(--kree-blue)] underline-offset-2 hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              politique de confidentialité
+            </Link>
+            .
+          </label>
+          {errors.terms && (
+            <p className="mt-1 text-sm text-red-500">{errors.terms.message}</p>
+          )}
         </div>
-      </Field>
-
-      <div>
-        <Button
-          className="w-full"
-          size="lg"
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Signing Up..." : "Sign Up"}
-        </Button>
       </div>
+
+      {formError && (
+        <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">
+          {formError}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="mt-1 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[var(--kree-orange)] text-sm font-semibold text-white shadow-lg shadow-[var(--kree-orange)]/25 transition hover:brightness-105 disabled:opacity-60"
+      >
+        {isSubmitting ? "Création…" : "Créer mon espace propriétaire"}
+      </button>
     </form>
   );
 }

@@ -5,12 +5,12 @@ export function PageMeta({
   description,
 }: {
   title: string;
-  description: string;
+  description?: string;
 }) {
   return (
     <Helmet>
       <title>{title}</title>
-      <meta name="description" content={description} />
+      {description ? <meta name="description" content={description} /> : null}
     </Helmet>
   );
 }

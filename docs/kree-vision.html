@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kree — Vision produit</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm 18mm 16mm;
+    }
+    :root {
+      --blue: #0c6e9a;
+      --blue-deep: #084d6b;
+      --blue-soft: #e8f4f8;
+      --orange: #ffb347;
+      --ink: #123041;
+      --muted: #5f7380;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.45;
+      background: #fff;
+    }
+    h1, h2, h3 {
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--blue-deep);
+      page-break-after: avoid;
+    }
+    h1 { font-size: 26pt; margin: 0 0 6pt; letter-spacing: -0.02em; }
+    h2 {
+      font-size: 14pt;
+      margin: 22pt 0 8pt;
+      padding-bottom: 4pt;
+      border-bottom: 2px solid var(--orange);
+    }
+    h3 { font-size: 11.5pt; margin: 14pt 0 6pt; color: var(--blue); }
+    p { margin: 0 0 8pt; }
+    ul, ol { margin: 0 0 10pt; padding-left: 18pt; }
+    li { margin-bottom: 3pt; }
+    strong { color: var(--ink); }
+    .cover {
+      min-height: 240mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 28pt 8pt;
+      page-break-after: always;
+      background:
+        radial-gradient(ellipse at top right, rgba(255,179,71,0.18), transparent 45%),
+        linear-gradient(160deg, #084d6b 0%, #0c6e9a 48%, #0a5a7e 100%);
+      color: #fff;
+      border-radius: 0;
+      margin: -5mm -2mm 0;
+      padding: 40mm 18mm;
+    }
+    .cover .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 9pt;
+      font-weight: 700;
+      color: var(--orange);
+      margin-bottom: 14pt;
+    }
+    .cover h1 {
+      color: #fff;
+      font-size: 34pt;
+      margin-bottom: 10pt;
+    }
+    .cover .subtitle {
+      font-size: 14pt;
+      opacity: 0.92;
+      max-width: 420pt;
+      margin-bottom: 28pt;
+    }
+    .cover .meta {
+      font-size: 10pt;
+      opacity: 0.8;
+      border-top: 1px solid rgba(255,255,255,0.25);
+      padding-top: 14pt;
+      margin-top: auto;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--orange);
+      color: #123041;
+      font-weight: 700;
+      font-size: 9pt;
+      padding: 4pt 10pt;
+      border-radius: 999px;
+      margin-bottom: 16pt;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8pt 0 14pt;
+      font-size: 9.5pt;
+    }
+    th, td {
+      border: 1px solid #d5e6ee;
+      padding: 7pt 8pt;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: var(--blue-soft);
+      color: var(--blue-deep);
+      font-weight: 700;
+    }
+    tr:nth-child(even) td { background: #fafcfd; }
+    .callout {
+      background: var(--blue-soft);
+      border-left: 4px solid var(--blue);
+      padding: 10pt 12pt;
+      margin: 10pt 0 14pt;
+      border-radius: 0 8pt 8pt 0;
+    }
+    .quote {
+      font-style: italic;
+      color: var(--blue-deep);
+      border-left: 3px solid var(--orange);
+      padding: 6pt 0 6pt 12pt;
+      margin: 10pt 0;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10pt;
+      margin: 10pt 0 14pt;
+    }
+    .card {
+      border: 1px solid #d5e6ee;
+      border-radius: 10pt;
+      padding: 10pt 12pt;
+      background: #fff;
+    }
+    .card h3 { margin-top: 0; }
+    .pill {
+      display: inline-block;
+      background: var(--blue);
+      color: #fff;
+      font-size: 8pt;
+      font-weight: 700;
+      padding: 2pt 7pt;
+      border-radius: 999px;
+      margin-right: 4pt;
+    }
+    .pill.orange { background: var(--orange); color: var(--ink); }
+    .footer-note {
+      margin-top: 28pt;
+      padding-top: 10pt;
+      border-top: 1px solid #d5e6ee;
+      font-size: 8.5pt;
+      color: var(--muted);
+    }
+    .arch {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 8pt;
+      background: #0f2f3d;
+      color: #d7eef7;
+      padding: 12pt;
+      border-radius: 8pt;
+      white-space: pre;
+      overflow: hidden;
+      line-height: 1.35;
+    }
+    .section { page-break-inside: avoid; }
+  </style>
+</head>
+<body>
+
+  <!-- COVER -->
+  <section class="cover">
+    <div class="badge">Document de vision · v1.0</div>
+    <div class="eyebrow">Marketplace · Tunisie · IA</div>
+    <h1>Kree</h1>
+    <p class="subtitle">
+      Louez mieux. Bougez plus malin.<br />
+      Plateforme de location de maisons &amp; véhicules, enrichie par l’IA&nbsp;:
+      planification, comparaison de prix, et coach propriétaire.
+    </p>
+    <p class="meta">
+      Novembre 2026<br />
+      Confidentiel — usage interne / partenaires<br />
+      Frontend livré · Backend à venir
+    </p>
+  </section>
+
+  <!-- 1 -->
+  <h2>1. Résumé exécutif</h2>
+  <p>
+    <strong>Kree</strong> est une marketplace peer-to-peer en Tunisie qui connecte voyageurs et locataires
+    aux propriétaires de <strong>maisons</strong> et de <strong>véhicules</strong>. Le client avance sans compte forcé&nbsp;;
+    le propriétaire dispose d’un espace métier clair.
+  </p>
+  <p>
+    Au-delà du catalogue, Kree devient un <strong>copilote de mobilité et d’hébergement</strong>&nbsp;:
+    planification assistée, comparaison de prix, et assistant business (rapports, alertes, réponses clients).
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Pour le client</th><th>Pour le propriétaire</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Pas de compte obligatoire</td><td>Dashboard maisons ≠ véhicules</td></tr>
+      <tr><td>WhatsApp en un clic</td><td>Demandes centralisées + notifications</td></tr>
+      <tr><td>Demande de réservation simple</td><td>Publication multi-photos</td></tr>
+      <tr><td>Planificateur IA (séjour + budget)</td><td>Coach business + rapports</td></tr>
+      <tr><td>Comparaison de prix</td><td>Aide réponses WhatsApp / téléphone</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 2 -->
+  <h2>2. Problème</h2>
+  <ol>
+    <li>Annonces dispersées (réseaux sociaux, sites hétérogènes)</li>
+    <li>Peu de transparence sur les prix, comparaison difficile</li>
+    <li>Parcours client lourd (comptes, formulaires, délais)</li>
+    <li>Propriétaires sans outils de suivi ni d’optimisation</li>
+    <li>Planification de séjour / déplacement improvisée</li>
+  </ol>
+  <div class="callout">
+    Kree unifie découverte, comparaison, réservation légère et accompagnement IA — côté client <em>et</em> côté loueur.
+  </div>
+
+  <!-- 3 -->
+  <h2>3. Produit actuel (frontend livré)</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Site public</h3>
+      <ul>
+        <li>Accueil marketing FR</li>
+        <li>Catalogues maisons &amp; véhicules</li>
+        <li>Fiches détail + galerie / 3D</li>
+        <li>Page Contact</li>
+        <li>Aucun compte locataire requis</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Espace propriétaire</h3>
+      <ul>
+        <li>Auth loueur uniquement</li>
+        <li>Vue d’ensemble &amp; stats</li>
+        <li>Annonces séparées + ajout</li>
+        <li>Demandes accepter / refuser</li>
+        <li>Profil (photo, bio, contact)</li>
+      </ul>
+    </div>
+  </div>
+  <h3>Parcours client sur une annonce</h3>
+  <ol>
+    <li><span class="pill">1</span> Contacter → WhatsApp prérempli</li>
+    <li><span class="pill">2</span> Demander une réservation → formulaire court</li>
+    <li><span class="pill orange">3</span> Demande «&nbsp;en attente&nbsp;» dans le dashboard propriétaire</li>
+  </ol>
+
+  <!-- 4 -->
+  <h2>4. Trois idées différenciantes (IA)</h2>
+
+  <div class="section">
+    <h3>4.1 Kree Plan — planification de mouvement</h3>
+    <p>
+      Un chatbot converse avec l’utilisateur jusqu’à construire le <strong>meilleur plan</strong>
+      (besoins, budget, disponibilités catalogue).
+    </p>
+    <div class="quote">
+      «&nbsp;4 jours à Hammamet en famille, appart près de la plage + voiture auto, budget 1&nbsp;200 TND.&nbsp;»
+    </div>
+    <ul>
+      <li>Clarifie contraintes (dates, personnes, confort, aéroport…)</li>
+      <li>Cherche maisons + véhicules dans Kree</li>
+      <li>Propose 2–3 plans (éco / équilibré / confort)</li>
+      <li>Compare le prix total et oriente vers réservation / WhatsApp</li>
+    </ul>
+    <p><strong>Valeur&nbsp;:</strong> Kree devient le point d’entrée du voyage, pas seulement le catalogue.</p>
+  </div>
+
+  <div class="section">
+    <h3>4.2 Comparateur de prix</h3>
+    <ul>
+      <li>Comparer 2 à 4 annonces côte à côte</li>
+      <li>Normalisation TND / nuit, / jour, total période</li>
+      <li>Score&nbsp;: prix, note, distance, équipements</li>
+      <li>Alertes «&nbsp;meilleure offre&nbsp;» par zone / dates</li>
+      <li>Branché sur Kree Plan pour des comparaisons automatiques</li>
+    </ul>
+    <p><strong>Valeur&nbsp;:</strong> transparence → confiance → conversion.</p>
+  </div>
+
+  <div class="section">
+    <h3>4.3 Kree Coach — assistant propriétaire</h3>
+    <table>
+      <thead>
+        <tr><th>Besoin</th><th>Réponse du Coach</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Business</td><td>Pricing, occupation, photos, titres</td></tr>
+        <tr><td>Rapports</td><td>Vues, demandes, acceptation, revenus estimés</td></tr>
+        <tr><td>À corriger</td><td>Checklist qualité d’annonce</td></tr>
+        <tr><td>Opérations</td><td>Alerte fin de séjour / check-out</td></tr>
+        <tr><td>Relation client</td><td>Brouillons WhatsApp / téléphone</td></tr>
+        <tr><td>Urgences</td><td>Relance des demandes en attente trop longues</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Valeur&nbsp;:</strong> le propriétaire reste parce que la plateforme travaille pour lui.</p>
+  </div>
+
+  <!-- 5 -->
+  <h2>5. Architecture cible</h2>
+  <div class="arch">Clients (web/mobile)
+  Catalogue · WhatsApp · Réservation · Plan IA · Comparateur
+            │
+            ▼
+Backend Kree ── Auth · Annonces · Demandes · Search · Notifs · WA
+       │                         │
+  Services IA              Données
+  Plan / Coach / Comp.     Users · Listings · Analytics</div>
+
+  <!-- 6 -->
+  <h2>6. Roadmap</h2>
+  <table>
+    <thead>
+      <tr><th>Phase</th><th>Focus</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>A — Fondations</strong></td><td>Backend réel, auth, médias, WhatsApp vérifié, prod stable</td></tr>
+      <tr><td><strong>B — Conversion</strong></td><td>Comparateur, carte, avis, notifications</td></tr>
+      <tr><td><strong>C — Différenciation</strong></td><td>Kree Plan, Kree Coach, réponses assistées, alertes check-out</td></tr>
+      <tr><td><strong>D — Échelle</strong></td><td>Mobile, paiements (si cadre OK), Maghreb, partenaires</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 7 -->
+  <h2>7. Modèle économique (pistes)</h2>
+  <ol>
+    <li>Commission sur réservation confirmée</li>
+    <li>Abonnement propriétaire (Coach Pro, rapports, mise en avant)</li>
+    <li>Boost d’annonces (visibilité catalogue / Plan IA)</li>
+    <li>Partenariats (assurance, transfert aéroport)</li>
+  </ol>
+
+  <!-- 8 -->
+  <h2>8. KPI early</h2>
+  <table>
+    <thead>
+      <tr><th>Indicateur</th><th>Cible</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Annonces actives</td><td>Croissance hebdomadaire stable</td></tr>
+      <tr><td>Demandes / annonce / mois</td><td>≥ 2</td></tr>
+      <tr><td>Temps 1ʳᵉ réponse</td><td>&lt; 2 h</td></tr>
+      <tr><td>Taux d’acceptation</td><td>&gt; 50&nbsp;%</td></tr>
+      <tr><td>Sessions Plan IA / semaine</td><td>Adoption Phase C</td></tr>
+      <tr><td>NPS propriétaires</td><td>&gt; 40</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 9 -->
+  <h2>9. Positionnement</h2>
+  <div class="callout">
+    <strong>Kree n’est pas seulement une vitrine de locations.</strong><br />
+    C’est la plateforme qui <em>planifie</em> le déplacement du client, <em>compare</em> les offres,
+    et <em>coach</em> le propriétaire pour mieux louer.
+  </div>
+  <p><strong>Slogan de travail&nbsp;:</strong> «&nbsp;Louez mieux. Bougez plus malin.&nbsp;»</p>
+
+  <!-- 10 -->
+  <h2>10. État &amp; prochaines étapes</h2>
+  <p><strong>Déjà réalisé (frontend)&nbsp;:</strong> marketplace, WhatsApp + demandes, auth &amp; dashboard propriétaire,
+    publication multi-images, profil, notifications, contact, nettoyage produit.</p>
+  <p><strong>Prochaine étape&nbsp;:</strong> backend (API, base de données, auth réelle, stockage médias),
+    puis Plan IA / Comparateur / Coach selon la roadmap.</p>
+
+  <div class="footer-note">
+    Document préparé pour Kree · Novembre 2026 · Vision produit v1.0<br />
+    Les idées IA (Plan, Comparateur, Coach) constituent le différenciateur stratégique sur le marché tunisien.
+  </div>
+
+</body>
+</html>

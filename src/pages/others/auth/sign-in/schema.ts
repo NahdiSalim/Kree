@@ -4,9 +4,9 @@ export const signInSchema = z.object({
   email: z
     .string()
     .trim()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
+    .min(1, "L’e-mail est requis")
+    .email("Veuillez entrer une adresse e-mail valide"),
+  password: z.string().min(1, "Le mot de passe est requis"),
   keepLoggedIn: z.boolean().optional(),
 });
 

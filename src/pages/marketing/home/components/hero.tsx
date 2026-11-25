@@ -1,24 +1,33 @@
+import { Link } from "react-router";
 import { Autoplay, EffectFade, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { heroSlides } from "../data";
+import { useHome } from "@/lib/home-api";
+import { HomeHeroSkeleton } from "@/pages/marketing/components/skeletons";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 
 export default function Hero() {
+  const { data, loading } = useHome();
+  const slides = data?.hero ?? [];
+
+  if (loading && slides.length === 0) {
+    return <HomeHeroSkeleton />;
+  }
+
   return (
     <section className="relative h-[88vh] min-h-[620px] overflow-hidden">
       <Swiper
         modules={[Autoplay, EffectFade, Pagination]}
         effect="fade"
         fadeEffect={{ crossFade: true }}
-        loop
+        loop={slides.length > 1}
         speed={1100}
         autoplay={{ delay: 4200, disableOnInteraction: false }}
         pagination={{ clickable: true, el: ".kree-hero-pagination" }}
         className="kree-hero-swiper h-full w-full"
       >
-        {heroSlides.map((slide) => (
+        {slides.map((slide) => (
           <SwiperSlide key={slide.id} className="!h-full">
             <div className="relative h-full w-full overflow-hidden">
               <img
@@ -41,9 +50,19 @@ export default function Hero() {
                   <p className="mt-4 max-w-xl text-base text-white/85 sm:text-lg">
                     {slide.subtitle}
                   </p>
-                  <p className="mt-6 inline-flex items-center rounded-2xl bg-[var(--kree-orange)] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-[var(--kree-orange)]/30">
-                    {slide.accent}
-                  </p>
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <p className="inline-flex items-center rounded-2xl bg-[var(--kree-orange)] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-[var(--kree-orange)]/30">
+                      {slide.accent}
+                    </p>
+                    {slide.href && (
+                      <Link
+                        to={slide.href}
+                        className="inline-flex items-center rounded-2xl bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/25"
+                      >
+                        Voir l’annonce →
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

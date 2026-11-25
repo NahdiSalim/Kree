@@ -22,7 +22,11 @@
       "pro": "احترافي"
     },
     "items": {
-      "dashboard": "لوحة التحكم",
+      "dashboard": "نظرة عامة",
+      "ownerMaisons": "منازلي",
+      "ownerVehicules": "مركباتي",
+      "ownerDemandes": "الطلبات",
+      "ownerProfile": "ملفي",
       "ecommerceHome": "التجارة الإلكترونية",
       "analytics": "التحليلات",
       "marketing": "التسويق",

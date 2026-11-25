@@ -1,10 +1,33 @@
 import { useState, type ReactNode } from "react";
+import { useNavigate } from "react-router";
 import { tunisianCities } from "../data";
+import {
+  houseCategories,
+  vehicleCategories,
+} from "@/pages/marketing/listings/data";
 
 type Category = "maison" | "vehicule";
 
 export default function SearchBar() {
+  const navigate = useNavigate();
   const [category, setCategory] = useState<Category>("maison");
+  const [city, setCity] = useState("");
+  const [listingType, setListingType] = useState("");
+  const [priceMax, setPriceMax] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (city) params.set("city", city);
+    if (listingType) params.set("category", listingType);
+    if (priceMax) params.set("priceMax", priceMax);
+    const qs = params.toString();
+    void navigate(
+      category === "maison"
+        ? `/maisons${qs ? `?${qs}` : ""}`
+        : `/vehicules${qs ? `?${qs}` : ""}`,
+    );
+  };
 
   return (
     <div className="relative z-30 -mt-20 px-4 sm:px-6 lg:px-8">
@@ -13,12 +36,18 @@ export default function SearchBar() {
           <div className="flex flex-wrap items-center gap-2 border-b border-[var(--kree-blue)]/8 bg-[var(--kree-blue-soft)]/50 px-4 py-3 sm:px-6">
             <Toggle
               active={category === "maison"}
-              onClick={() => setCategory("maison")}
+              onClick={() => {
+                setCategory("maison");
+                setListingType("");
+              }}
               label="Maisons"
             />
             <Toggle
               active={category === "vehicule"}
-              onClick={() => setCategory("vehicule")}
+              onClick={() => {
+                setCategory("vehicule");
+                setListingType("");
+              }}
               label="Véhicules"
             />
             <span className="ml-auto hidden text-xs font-medium text-[var(--kree-muted)] sm:inline">
@@ -27,55 +56,47 @@ export default function SearchBar() {
           </div>
 
           <form
-            className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-[1.1fr_1fr_1fr_1fr_auto]"
-            onSubmit={(e) => e.preventDefault()}
+            className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-[1.1fr_1fr_1fr_auto]"
+            onSubmit={handleSubmit}
           >
             <Field label="Ville">
-              <select className="kree-field" defaultValue="">
-                <option value="" disabled>
-                  Choisir une ville
-                </option>
-                {tunisianCities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
+              <select
+                className="kree-field"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              >
+                <option value="">Toutes les villes</option>
+                {tunisianCities.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
                   </option>
                 ))}
               </select>
             </Field>
 
             <Field label={category === "maison" ? "Type de bien" : "Type de véhicule"}>
-              <select className="kree-field" defaultValue="">
-                <option value="" disabled>
-                  Tous les types
-                </option>
-                {category === "maison" ? (
-                  <>
-                    <option>Appartement</option>
-                    <option>Villa</option>
-                    <option>Maison</option>
-                    <option>Studio</option>
-                    <option>Duplex</option>
-                  </>
-                ) : (
-                  <>
-                    <option>Voiture</option>
-                    <option>SUV</option>
-                    <option>Utilitaire</option>
-                    <option>Moto</option>
-                    <option>Scooter</option>
-                  </>
+              <select
+                className="kree-field"
+                value={listingType}
+                onChange={(e) => setListingType(e.target.value)}
+              >
+                <option value="">Tous les types</option>
+                {(category === "maison" ? houseCategories : vehicleCategories).map(
+                  (c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ),
                 )}
               </select>
-            </Field>
-
-            <Field label="Date début">
-              <input type="date" className="kree-field" />
             </Field>
 
             <Field label="Budget max (TND)">
               <input
                 type="number"
                 min={0}
+                value={priceMax}
+                onChange={(e) => setPriceMax(e.target.value)}
                 placeholder={category === "maison" ? "ex. 1500" : "ex. 200"}
                 className="kree-field"
               />

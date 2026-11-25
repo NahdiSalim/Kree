@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -9,14 +8,18 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
+import { ApiError } from "@/lib/api";
+import { signinOwner } from "@/lib/owner-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { signInSchema, type SignInFormData } from "./schema";
 
 export default function SignInFormFields() {
   const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState("");
+  const navigate = useNavigate();
 
   const {
     register,
@@ -28,51 +31,64 @@ export default function SignInFormFields() {
     defaultValues: {
       email: "",
       password: "",
-      keepLoggedIn: false,
+      keepLoggedIn: true,
     },
     mode: "onTouched",
   });
 
-  const handleFormSubmit = async (_data: SignInFormData) => {
-    // handle submit action
+  const handleFormSubmit = async (data: SignInFormData) => {
+    setFormError("");
+    try {
+      await signinOwner({ email: data.email, password: data.password });
+      navigate("/dashboard");
+    } catch (err) {
+      setFormError(
+        err instanceof ApiError ? err.message : "Connexion impossible",
+      );
+    }
   };
 
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="space-y-5"
+      className="space-y-4"
       noValidate
     >
       <Field data-invalid={Boolean(errors.email)}>
-        <FieldLabel className="mb-1.5 block">
-          Email <span className="text-red-500">*</span>
+        <FieldLabel className="mb-1.5 block text-sm font-semibold text-[var(--kree-ink)]">
+          E-mail
         </FieldLabel>
         <Input
           {...register("email")}
           type="email"
-          placeholder="info@gmail.com"
+          autoComplete="email"
+          placeholder="vous@exemple.tn"
           aria-invalid={errors.email ? "true" : undefined}
+          className="kree-auth-input h-12 rounded-2xl border-0 bg-[var(--kree-blue-soft)] px-4 text-[var(--kree-ink)] shadow-none ring-1 ring-[var(--kree-blue)]/10 focus-visible:ring-2 focus-visible:ring-[var(--kree-blue)]/35"
         />
         <FieldError errors={[errors.email]} />
       </Field>
 
       <Field data-invalid={Boolean(errors.password)}>
-        <FieldLabel className="mb-1.5 block">
-          Password <span className="text-red-500">*</span>
+        <FieldLabel className="mb-1.5 block text-sm font-semibold text-[var(--kree-ink)]">
+          Mot de passe
         </FieldLabel>
-        <InputGroup>
+        <InputGroup className="h-12 overflow-hidden rounded-2xl bg-[var(--kree-blue-soft)] ring-1 ring-[var(--kree-blue)]/10 has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-[var(--kree-blue)]/35">
           <InputGroupInput
             {...register("password")}
             type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
+            autoComplete="current-password"
+            placeholder="Votre mot de passe"
             aria-invalid={errors.password ? "true" : undefined}
+            className="border-0 bg-transparent shadow-none focus-visible:ring-0"
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton
+              type="button"
               size="icon-xs"
               onClick={() => setShowPassword((prev) => !prev)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-              className="text-gray-500 dark:text-gray-400"
+              aria-label={showPassword ? "Masquer" : "Afficher"}
+              className="text-[var(--kree-muted)]"
             >
               {showPassword ? (
                 <EyeIcon className="text-current" />
@@ -85,8 +101,8 @@ export default function SignInFormFields() {
         <FieldError errors={[errors.password]} />
       </Field>
 
-      <div className="flex items-center justify-between">
-        <Field orientation="horizontal" className="w-auto items-center gap-3">
+      <div className="flex items-center justify-between gap-3 pt-0.5">
+        <Field orientation="horizontal" className="w-auto items-center gap-2.5">
           <Controller
             control={control}
             name="keepLoggedIn"
@@ -100,29 +116,32 @@ export default function SignInFormFields() {
           />
           <FieldLabel
             htmlFor="keep-logged-in"
-            className="text-theme-sm block cursor-pointer font-normal text-gray-700 dark:text-gray-400"
+            className="cursor-pointer text-sm font-normal text-[var(--kree-muted)]"
           >
-            Keep me logged in
+            Se souvenir de moi
           </FieldLabel>
         </Field>
         <Link
-          to="/reset-password"
-          className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
+          to="/signin"
+          className="text-sm font-semibold text-[var(--kree-blue)] hover:underline"
         >
-          Forgot password?
+          Mot de passe oublié ?
         </Link>
       </div>
 
-      <div>
-        <Button
-          className="w-full"
-          size="lg"
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Signing In..." : "Sign In"}
-        </Button>
-      </div>
+      {formError && (
+        <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">
+          {formError}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="mt-2 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[var(--kree-blue)] text-sm font-semibold text-white shadow-lg shadow-[var(--kree-blue)]/25 transition hover:brightness-110 disabled:opacity-60"
+      >
+        {isSubmitting ? "Connexion…" : "Se connecter"}
+      </button>
     </form>
   );
 }

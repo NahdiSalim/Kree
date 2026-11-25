@@ -22,7 +22,11 @@
       "pro": "pro"
     },
     "items": {
-      "dashboard": "Panel",
+      "dashboard": "Resumen",
+      "ownerMaisons": "Mis casas",
+      "ownerVehicules": "Mis vehículos",
+      "ownerDemandes": "Solicitudes",
+      "ownerProfile": "Mi perfil",
       "ecommerceHome": "Comercio electrónico",
       "analytics": "Analítica",
       "marketing": "Marketing",

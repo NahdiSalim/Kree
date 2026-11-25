@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// Propriétaire / loueur only (clients have no accounts)
+model Owner {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  phone        String?
+  city         String?
+  company      String?
+  bio          String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  houses   HouseListing[]
+  vehicles VehicleListing[]
+}
+
+model HouseListing {
+  id           String   @id @default(cuid())
+  ownerId      String
+  owner        Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  city         String
+  governorate  String
+  addressArea  String
+  category     String
+  price        Int
+  unit         String
+  images       String[]
+  amenities    String[]
+  bedrooms     Int      @default(0)
+  bathrooms    Int      @default(1)
+  area         Int
+  furnished    Boolean  @default(true)
+  floor        Int?
+  parking      Boolean  @default(false)
+  petsAllowed  Boolean  @default(false)
+  availableFrom DateTime
+  tour3dUrl    String?
+  rating       Float    @default(5)
+  reviewsCount Int      @default(0)
+  featured     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  reservations ReservationRequest[]
+}
+
+model VehicleListing {
+  id              String   @id @default(cuid())
+  ownerId         String
+  owner           Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  title           String
+  description     String
+  city            String
+  governorate     String
+  category        String
+  price           Int
+  unit            String
+  images          String[]
+  features        String[]
+  brand           String
+  model           String
+  year            Int
+  transmission    String
+  fuel            String
+  seats           Int      @default(5)
+  doors           Int      @default(4)
+  mileage         Int      @default(0)
+  airConditioning Boolean  @default(true)
+  availableFrom   DateTime
+  tour3dUrl       String?
+  rating          Float    @default(5)
+  reviewsCount    Int      @default(0)
+  featured        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  reservations ReservationRequest[]
+}
+
+enum ReservationStatus {
+  pending
+  accepted
+  rejected
+}
+
+enum ListingType {
+  maison
+  vehicule
+}
+
+model ReservationRequest {
+  id            String            @id @default(cuid())
+  listingType   ListingType
+  houseId       String?
+  house         HouseListing?     @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  vehicleId     String?
+  vehicle       VehicleListing?   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  listingTitle  String
+  listingCity   String
+  listingImage  String
+  ownerName     String
+  clientName    String
+  clientPhone   String
+  clientEmail   String?
+  startDate     DateTime
+  endDate       DateTime
+  message       String            @default("")
+  status        ReservationStatus @default(pending)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}

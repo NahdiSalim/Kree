@@ -881,8 +881,9 @@ pre[class*="language-"].line-numbers {
   }
 }
 
-/* ========== Kree marketing home ========== */
-.kree-home {
+/* ========== Kree brand (marketing + owner dashboard) ========== */
+.kree-home,
+.kree-owner {
   --kree-blue: #0c6e9a;
   --kree-blue-deep: #084d6b;
   --kree-blue-soft: #e8f4f8;
@@ -893,10 +894,27 @@ pre[class*="language-"].line-numbers {
   --font-display: "Syne", sans-serif;
   --font-body: "Manrope", sans-serif;
   font-family: var(--font-body);
+  color: var(--kree-ink);
 }
 
-.kree-home .font-display {
+.kree-home .font-display,
+.kree-owner .font-display {
   font-family: var(--font-display);
+}
+
+.kree-owner [data-slot="sidebar-inner"],
+.kree-owner [data-slot="sidebar"][data-mobile="true"] {
+  background: linear-gradient(180deg, #0c6e9a 0%, #084d6b 100%) !important;
+  color: #fff;
+  border-color: transparent !important;
+}
+
+.kree-owner [data-slot="sidebar-container"] {
+  border-color: transparent !important;
+}
+
+.kree-owner [data-slot="sidebar"][data-mobile="true"] button {
+  color: #fff;
 }
 
 .kree-home .kree-field {
@@ -913,11 +931,13 @@ pre[class*="language-"].line-numbers {
   pointer-events: auto;
 }
 
-.kree-home .kree-hero-pagination .swiper-pagination-bullet {
+.kree-home .kree-hero-pagination .swiper-pagination-bullet,
+.kree-home .kree-about-hero-pagination .swiper-pagination-bullet {
   @apply !m-0 !h-2.5 !w-2.5 !rounded-full !bg-white/45 !opacity-100;
 }
 
-.kree-home .kree-hero-pagination .swiper-pagination-bullet-active {
+.kree-home .kree-hero-pagination .swiper-pagination-bullet-active,
+.kree-home .kree-about-hero-pagination .swiper-pagination-bullet-active {
   @apply !h-8 !w-2.5 !rounded-full !bg-[var(--kree-orange)];
 }
 
@@ -946,5 +966,86 @@ pre[class*="language-"].line-numbers {
   }
   to {
     transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+@keyframes kreeMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes kreeShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.kree-skel {
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--kree-blue-soft, #e8f4f8) 100%, white) 0%,
+    color-mix(in srgb, var(--kree-blue-soft, #e8f4f8) 55%, white) 40%,
+    color-mix(in srgb, var(--kree-blue-soft, #e8f4f8) 100%, white) 80%
+  );
+  background-size: 200% 100%;
+  animation: kreeShimmer 1.35s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kree-skel {
+    animation: none;
+  }
+}
+
+@keyframes kreeRevealUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kree-about .kree-reveal {
+  opacity: 0;
+}
+
+.kree-about-visible .kree-reveal,
+.kree-about .hero .kree-reveal,
+.kree-about section:first-of-type .kree-reveal {
+  animation: kreeRevealUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.kree-about .kree-reveal-delay-1 {
+  animation-delay: 0.12s;
+}
+.kree-about .kree-reveal-delay-2 {
+  animation-delay: 0.24s;
+}
+.kree-about .kree-reveal-delay-3 {
+  animation-delay: 0.36s;
+}
+
+.kree-about-pending .kree-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kree-about .kree-reveal,
+  .kree-about-visible .kree-reveal,
+  .kree-about .kree-marquee [class*="animate-"] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

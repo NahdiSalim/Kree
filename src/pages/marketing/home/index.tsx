@@ -11,14 +11,14 @@ import WhyUs from "./components/why-us";
 
 export default function HomePage() {
   return (
-    <div className="kree-home min-h-screen bg-white text-[var(--kree-ink)]">
+    <div className="kree-home flex min-h-screen flex-col bg-white text-[var(--kree-ink)]">
       <Helmet>
         <html lang="fr" />
         <title>Kree — Location maisons & véhicules en Tunisie</title>
       </Helmet>
 
       <Navbar />
-      <main>
+      <main className="flex-1">
         <Hero />
         <SearchBar />
         <LatestListings />

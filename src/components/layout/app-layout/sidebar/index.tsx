@@ -1,30 +1,20 @@
 import { Sidebar, SidebarContent, useSidebar } from "@/components/ui/sidebar";
 import { useState } from "react";
 import { useLocation } from "react-router";
-import { navItems, othersItems, supportItems } from "./data";
+import { navItems } from "./data";
 import AppSidebarHeader from "./sidebar-header";
 import SidebarNavGroup from "./sidebar-nav-group";
-import SidebarWidget from "./sidebar-widget";
-import type { MenuType, NavItem } from "./types";
+import type { MenuType } from "./types";
 
-const menuSections: { type: MenuType; labelKey: string; items: NavItem[] }[] = [
-  { type: "main", labelKey: "groups.menu", items: navItems },
-  { type: "support", labelKey: "groups.support", items: supportItems },
-  { type: "others", labelKey: "groups.others", items: othersItems },
+const menuSections = [
+  { type: "main" as MenuType, labelKey: "groups.menu", items: navItems },
 ];
 
 const findMatchingSubmenu = (path: string) => {
   for (const section of menuSections) {
     for (let index = 0; index < section.items.length; index++) {
       const nav = section.items[index];
-      if (
-        nav.subItems?.some(
-          (subItem) =>
-            subItem.path === path ||
-            (subItem.path === "/ai-settings" &&
-              path.startsWith("/ai-settings")),
-        )
-      ) {
+      if (nav.subItems?.some((subItem) => subItem.path === path)) {
         return { type: section.type, index };
       }
     }
@@ -62,18 +52,18 @@ export default function AppSidebar() {
     });
   };
 
-  const activeSections = menuSections.filter(
-    (section) => section.items.length > 0,
-  );
-
   return (
-    <Sidebar side="left" collapsible="icon">
+    <Sidebar
+      side="left"
+      collapsible="icon"
+      className="kree-owner-sidebar border-e border-[var(--kree-blue)]/10 bg-[linear-gradient(180deg,#0c6e9a_0%,#084d6b_100%)] text-white"
+    >
       <AppSidebarHeader showContent={showContent} />
 
-      <SidebarContent className="overflow-y-auto px-5 duration-300 ease-linear">
+      <SidebarContent className="overflow-y-auto px-4 duration-300 ease-linear">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
-            {activeSections.map((section) => (
+            {menuSections.map((section) => (
               <SidebarNavGroup
                 key={section.type}
                 labelKey={section.labelKey}
@@ -87,8 +77,6 @@ export default function AppSidebar() {
             ))}
           </div>
         </nav>
-
-        <SidebarWidget />
       </SidebarContent>
     </Sidebar>
   );

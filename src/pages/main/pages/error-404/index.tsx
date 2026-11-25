@@ -1,61 +1,60 @@
-import GridShape from "@/components/shared/grid-shape";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
 import { Link } from "react-router";
 import type { Error404Props } from "./types";
 
 export default function Error404({
-  title = "ERROR",
-  description = "We can’t seem to find the page you are looking for!",
-  homeLinkText = "Back to Home Page",
+  title = "404",
+  description = "Cette page n’existe pas ou a été déplacée.",
+  homeLinkText = "Retour à l’accueil",
   homeHref = "/",
   className,
 }: Error404Props) {
   return (
     <div
       className={cn(
-        "relative z-1 flex min-h-screen flex-col items-center justify-center overflow-hidden p-6",
+        "kree-owner relative z-1 flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[linear-gradient(180deg,#f3f9fb_0%,#ffffff_55%)] p-6",
         className,
       )}
     >
-      <GridShape />
-      <div className="mx-auto w-full max-w-60.5 text-center sm:max-w-118">
-        <h1 className="mb-8 text-2xl font-bold text-gray-800 xl:text-[64px] dark:text-white/90">
+      <div className="mx-auto w-full max-w-lg text-center">
+        <Link to="/" className="mb-8 inline-flex items-center gap-2">
+          <span className="relative flex size-10 items-center justify-center overflow-hidden rounded-2xl bg-[var(--kree-blue)] text-white">
+            <span className="font-display text-lg font-bold">K</span>
+            <span className="absolute -right-1 -bottom-1 size-3.5 rounded-full bg-[var(--kree-orange)]" />
+          </span>
+          <span className="font-display text-xl font-bold text-[var(--kree-ink)]">
+            Kree
+          </span>
+        </Link>
+
+        <p className="text-xs font-bold tracking-[0.14em] text-[var(--kree-orange)] uppercase">
+          Introuvable
+        </p>
+        <h1 className="mt-2 font-display text-5xl font-bold text-[var(--kree-blue)] sm:text-6xl">
           {title}
         </h1>
-
-        <img
-          src="/images/error/404.svg"
-          alt="404"
-          className="dark:hidden"
-          width={472}
-          height={152}
-        />
-        <img
-          src="/images/error/404-dark.svg"
-          alt="404"
-          className="hidden dark:block"
-          width={472}
-          height={152}
-        />
-
-        <p className="mt-10 mb-6 text-base text-gray-700 sm:text-lg dark:text-gray-400">
+        <p className="mt-4 text-base text-[var(--kree-muted)] sm:text-lg">
           {description}
         </p>
 
-        <Button
-          size="lg"
-          variant="outline"
-          className="h-12.5 bg-white"
-          nativeButton={false}
-          render={<Link to={homeHref} />}
-        >
-          {homeLinkText}
-        </Button>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            to={homeHref}
+            className="inline-flex h-12 items-center justify-center rounded-2xl bg-[var(--kree-blue)] px-6 text-sm font-semibold text-white shadow-lg shadow-[var(--kree-blue)]/20"
+          >
+            {homeLinkText}
+          </Link>
+          <Link
+            to="/contact"
+            className="inline-flex h-12 items-center justify-center rounded-2xl bg-[var(--kree-blue-soft)] px-6 text-sm font-semibold text-[var(--kree-blue)]"
+          >
+            Contact
+          </Link>
+        </div>
       </div>
 
-      <p className="absolute inset-s-1/2 bottom-6 -translate-x-1/2 text-center text-sm text-gray-500 rtl:translate-x-1/2 dark:text-gray-400">
-        &copy; {new Date().getFullYear()} - TailAdmin
+      <p className="absolute inset-s-1/2 bottom-6 -translate-x-1/2 text-center text-sm text-[var(--kree-muted)] rtl:translate-x-1/2">
+        &copy; {new Date().getFullYear()} Kree · Tunisie
       </p>
     </div>
   );

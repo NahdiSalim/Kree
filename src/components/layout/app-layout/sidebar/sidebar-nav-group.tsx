@@ -34,13 +34,13 @@ export default function SidebarNavGroup({
     <SidebarGroup className="p-0">
       <SidebarGroupLabel
         className={cn(
-          "mb-4 flex h-auto p-0 text-xs leading-5 text-gray-400 uppercase",
+          "mb-3 flex h-auto p-0 text-[11px] font-bold tracking-[0.14em] text-white/45 uppercase",
           !showContent ? "xl:justify-center" : "justify-start",
         )}
       >
-        {showContent ? t(labelKey) : <HorizontalDotsIcon />}
+        {showContent ? t(labelKey) : <HorizontalDotsIcon className="text-white/45" />}
       </SidebarGroupLabel>
-      <SidebarMenu className="gap-1">
+      <SidebarMenu className="gap-1.5">
         {items.map((nav, index) => (
           <SidebarMenuItem
             key={nav.key}

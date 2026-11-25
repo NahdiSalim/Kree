@@ -15,14 +15,18 @@
     "groups": {
       "menu": "Menu",
       "support": "Support",
-      "others": "Others"
+      "others": "Autres"
     },
     "badges": {
       "new": "new",
       "pro": "pro"
     },
     "items": {
-      "dashboard": "Dashboard",
+      "dashboard": "Vue d’ensemble",
+      "ownerMaisons": "Mes maisons",
+      "ownerVehicules": "Mes véhicules",
+      "ownerDemandes": "Demandes",
+      "ownerProfile": "Mon profil",
       "ecommerceHome": "Ecommerce",
       "analytics": "Analytics",
       "marketing": "Marketing",

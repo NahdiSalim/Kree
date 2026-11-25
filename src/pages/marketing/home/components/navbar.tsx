@@ -1,33 +1,32 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import {
-  houseTypes,
-  moreMenu,
-  vehicleTypes,
-  type MegaCategory,
-  type MegaPreview,
-} from "../data";
+import { BrandLogo } from "@/components/shared/brand-logo";
+import { useOwnerSession } from "@/lib/owner-auth";
+import { useHome, type MegaCategory, type MegaPreview } from "@/lib/home-api";
 
-type MenuKey = "maisons" | "vehicules" | "plus" | null;
+type MenuKey = "maisons" | "vehicules" | null;
 
-const menus: Record<Exclude<MenuKey, null>, MegaCategory[]> = {
-  maisons: houseTypes,
-  vehicules: vehicleTypes,
-  plus: moreMenu,
-};
-
-export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+export default function Navbar({ solid = false }: { solid?: boolean }) {
+  const owner = useOwnerSession();
+  const { data: home } = useHome();
+  const [scrolled, setScrolled] = useState(solid);
   const [open, setOpen] = useState<MenuKey>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+  const isSolid = solid || scrolled || mobileOpen || open;
+
+  const menus: Record<Exclude<MenuKey, null>, MegaCategory[]> = {
+    maisons: home?.mega.maisons ?? [],
+    vehicules: home?.mega.vehicules ?? [],
+  };
 
   useEffect(() => {
+    if (solid) return;
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [solid]);
 
   useEffect(() => {
     if (!open) return;
@@ -47,162 +46,284 @@ export default function Navbar() {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [mobileOpen]);
+
   const toggle = (key: Exclude<MenuKey, null>) => {
     setOpen((prev) => (prev === key ? null : key));
   };
 
   return (
-    <header
-      ref={navRef}
-      className={`kree-nav fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled || mobileOpen || open
-          ? "bg-white/95 shadow-[0_8px_30px_rgba(12,110,154,0.08)] backdrop-blur-xl"
-          : "bg-gradient-to-b from-black/45 to-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="group flex items-center gap-2.5" onClick={() => setOpen(null)}>
-          <span className="relative flex size-10 items-center justify-center overflow-hidden rounded-2xl bg-[var(--kree-blue)] text-white shadow-lg shadow-[var(--kree-blue)]/30">
-            <span className="font-display text-lg font-bold tracking-tight">K</span>
-            <span className="absolute -right-1 -bottom-1 size-4 rounded-full bg-[var(--kree-orange)]" />
-          </span>
-          <span
-            className={`font-display text-xl font-bold tracking-tight transition-colors ${
-              scrolled || mobileOpen || open ? "text-[var(--kree-ink)]" : "text-white"
-            }`}
+    <header ref={navRef} className="kree-nav fixed inset-x-0 top-0 z-50">
+      <div
+        className={`transition-all duration-500 ${
+          isSolid
+            ? "bg-white shadow-[0_8px_30px_rgba(12,110,154,0.08)]"
+            : "bg-gradient-to-b from-black/45 to-transparent"
+        }`}
+      >
+        <div className="relative mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-4 overflow-visible px-4 sm:px-6 lg:px-8">
+          <Link
+            to="/"
+            className="group relative z-10 -my-3 flex items-center"
+            onClick={() => setOpen(null)}
+            aria-label="TunisRent — accueil"
           >
-            Kree
-          </span>
-        </Link>
+            <BrandLogo className="h-14 sm:h-[3.75rem]" />
+          </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
-          {(
-            [
-              ["maisons", "Maisons"],
-              ["vehicules", "Véhicules"],
-              ["plus", "Plus"],
-            ] as const
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              aria-expanded={open === key}
-              onClick={() => toggle(key)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition ${
-                scrolled || open
+          <nav className="hidden items-center gap-1 lg:flex">
+            {(
+              [
+                ["maisons", "Maisons"],
+                ["vehicules", "Véhicules"],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                aria-expanded={open === key}
+                onClick={() => toggle(key)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition ${
+                  isSolid
+                    ? "text-[var(--kree-ink)]/80 hover:bg-[var(--kree-blue-soft)] hover:text-[var(--kree-blue)]"
+                    : "text-white/90 hover:bg-white/10 hover:text-white"
+                } ${
+                  open === key ? "bg-[var(--kree-blue-soft)] text-[var(--kree-blue)]" : ""
+                }`}
+              >
+                {label}
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className={`transition ${open === key ? "rotate-180" : ""}`}
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+            ))}
+
+            <Link
+              to="/a-propos"
+              onClick={() => setOpen(null)}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                isSolid
                   ? "text-[var(--kree-ink)]/80 hover:bg-[var(--kree-blue-soft)] hover:text-[var(--kree-blue)]"
                   : "text-white/90 hover:bg-white/10 hover:text-white"
-              } ${
-                open === key
-                  ? scrolled || open
-                    ? "bg-[var(--kree-blue-soft)] text-[var(--kree-blue)]"
-                    : "bg-white/10 text-white"
-                  : ""
               }`}
             >
-              {label}
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                className={`transition ${open === key ? "rotate-180" : ""}`}
-              >
-                <path d="M6 9l6 6 6-6" />
+              À propos
+            </Link>
+            <Link
+              to="/contact"
+              onClick={() => setOpen(null)}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                isSolid
+                  ? "text-[var(--kree-ink)]/80 hover:bg-[var(--kree-blue-soft)] hover:text-[var(--kree-blue)]"
+                  : "text-white/90 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              Contact
+            </Link>
+          </nav>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            {owner ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className={`hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition sm:inline-flex ${
+                    isSolid
+                      ? "text-[var(--kree-blue)] hover:bg-[var(--kree-blue-soft)]"
+                      : "text-white hover:bg-white/10"
+                  }`}
+                >
+                  {owner.avatar ? (
+                    <img
+                      src={owner.avatar}
+                      alt=""
+                      className="size-7 rounded-full object-cover ring-2 ring-white/40"
+                    />
+                  ) : null}
+                  Tableau de bord
+                </Link>
+                <Link
+                  to="/dashboard/maisons/ajouter"
+                  className="inline-flex items-center rounded-full bg-[var(--kree-orange)] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--kree-orange)]/25 transition hover:-translate-y-0.5 hover:brightness-105"
+                >
+                  Publier
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/signin"
+                  className={`hidden rounded-full px-4 py-2 text-sm font-semibold transition sm:inline-flex ${
+                    isSolid
+                      ? "text-[var(--kree-blue)] hover:bg-[var(--kree-blue-soft)]"
+                      : "text-white hover:bg-white/10"
+                  }`}
+                >
+                  Espace pro
+                </Link>
+                <Link
+                  to="/signup"
+                  className="inline-flex items-center rounded-full bg-[var(--kree-orange)] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--kree-orange)]/25 transition hover:-translate-y-0.5 hover:brightness-105"
+                >
+                  Publier
+                </Link>
+              </>
+            )}
+            <button
+              type="button"
+              className={`inline-flex size-10 items-center justify-center rounded-full lg:hidden ${
+                isSolid
+                  ? "bg-[var(--kree-blue-soft)] text-[var(--kree-blue)]"
+                  : "bg-white/15 text-white"
+              }`}
+              aria-label="Menu"
+              onClick={() => {
+                setOpen(null);
+                setMobileOpen((v) => !v);
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                {mobileOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
               </svg>
             </button>
-          ))}
+          </div>
 
-          <a
-            href="#derniers"
-            onClick={() => setOpen(null)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              scrolled || open
-                ? "text-[var(--kree-ink)]/80 hover:bg-[var(--kree-blue-soft)] hover:text-[var(--kree-blue)]"
-                : "text-white/90 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            Nouveautés
-          </a>
-          <a
-            href="#offres"
-            onClick={() => setOpen(null)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              scrolled || open
-                ? "text-[var(--kree-ink)]/80 hover:bg-[var(--kree-blue-soft)] hover:text-[var(--kree-blue)]"
-                : "text-white/90 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            Offres
-          </a>
-        </nav>
-
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Link
-            to="/signin"
-            className={`hidden rounded-full px-4 py-2 text-sm font-semibold transition sm:inline-flex ${
-              scrolled || mobileOpen || open
-                ? "text-[var(--kree-blue)] hover:bg-[var(--kree-blue-soft)]"
-                : "text-white hover:bg-white/10"
-            }`}
-          >
-            Connexion
-          </Link>
-          <Link
-            to="/signup"
-            className="inline-flex items-center rounded-full bg-[var(--kree-orange)] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--kree-orange)]/25 transition hover:-translate-y-0.5 hover:brightness-105"
-          >
-            Publier
-          </Link>
-          <button
-            type="button"
-            className={`inline-flex size-10 items-center justify-center rounded-full lg:hidden ${
-              scrolled || mobileOpen || open
-                ? "bg-[var(--kree-blue-soft)] text-[var(--kree-blue)]"
-                : "bg-white/15 text-white"
-            }`}
-            aria-label="Menu"
-            onClick={() => {
-              setOpen(null);
-              setMobileOpen((v) => !v);
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              {mobileOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
-            </svg>
-          </button>
+          {open && (
+            <div className="absolute top-full left-4 z-[60] hidden pt-2 sm:left-6 lg:left-8 lg:block">
+              <ThreePanelMega
+                categories={menus[open]}
+                listPath={open === "vehicules" ? "/vehicules" : "/maisons"}
+                listingBase={open === "vehicules" ? "/vehicules" : "/maisons"}
+                onNavigate={() => setOpen(null)}
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      {open && (
-        <ThreePanelMega
-          categories={menus[open]}
-          onNavigate={() => setOpen(null)}
-        />
-      )}
-
       {mobileOpen && (
-        <div className="max-h-[80vh] overflow-y-auto border-t border-[var(--kree-blue)]/10 bg-white px-4 py-5 lg:hidden">
-          <MobileGroup title="Maisons" items={houseTypes} />
-          <MobileGroup title="Véhicules" items={vehicleTypes} />
-          <MobileGroup title="Plus" items={moreMenu} />
-          <div className="mt-4 flex flex-col gap-2">
+        <div className="fixed inset-0 z-[70] flex flex-col bg-white lg:hidden">
+          <div className="flex h-[4.5rem] shrink-0 items-center justify-between overflow-visible border-b border-[var(--kree-blue)]/10 px-4">
             <Link
-              to="/signin"
-              className="rounded-2xl border border-[var(--kree-blue)]/15 px-4 py-3 text-center font-semibold text-[var(--kree-blue)]"
+              to="/"
+              className="relative z-10 -my-3 inline-flex items-center"
+              onClick={() => setMobileOpen(false)}
+              aria-label="TunisRent — accueil"
+            >
+              <BrandLogo className="h-14 sm:h-[3.75rem]" />
+            </Link>
+            <button
+              type="button"
+              className="inline-flex size-10 items-center justify-center rounded-full bg-[var(--kree-blue-soft)] text-[var(--kree-blue)]"
+              aria-label="Fermer le menu"
               onClick={() => setMobileOpen(false)}
             >
-              Connexion
-            </Link>
-            <Link
-              to="/signup"
-              className="rounded-2xl bg-[var(--kree-blue)] px-4 py-3 text-center font-semibold text-white"
-              onClick={() => setMobileOpen(false)}
-            >
-              Créer un compte
-            </Link>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-4 py-6">
+            <div className="mb-6 grid gap-2">
+              <Link
+                to="/maisons"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-2xl bg-[var(--kree-blue)] px-4 py-4 text-center font-semibold text-white"
+              >
+                Maisons
+              </Link>
+              <Link
+                to="/vehicules"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-2xl bg-[var(--kree-blue-soft)] px-4 py-4 text-center font-semibold text-[var(--kree-blue)]"
+              >
+                Véhicules
+              </Link>
+              <Link
+                to="/a-propos"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-2xl border border-[var(--kree-blue)]/15 px-4 py-4 text-center font-semibold text-[var(--kree-ink)]"
+              >
+                À propos
+              </Link>
+              <Link
+                to="/contact"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-2xl border border-[var(--kree-blue)]/15 px-4 py-4 text-center font-semibold text-[var(--kree-ink)]"
+              >
+                Contact
+              </Link>
+            </div>
+
+            <MobileGroup
+              title="Maisons"
+              items={menus.maisons}
+              onNavigate={() => setMobileOpen(false)}
+            />
+            <MobileGroup
+              title="Véhicules"
+              items={menus.vehicules}
+              onNavigate={() => setMobileOpen(false)}
+            />
+          </div>
+
+          <div className="shrink-0 space-y-2 border-t border-[var(--kree-blue)]/10 bg-white px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            {owner ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="block rounded-2xl border border-[var(--kree-blue)]/15 px-4 py-3.5 text-center font-semibold text-[var(--kree-blue)]"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Tableau de bord
+                </Link>
+                <Link
+                  to="/dashboard/maisons/ajouter"
+                  className="block rounded-2xl bg-[var(--kree-orange)] px-4 py-3.5 text-center font-semibold text-white"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Publier une annonce
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/signin"
+                  className="block rounded-2xl border border-[var(--kree-blue)]/15 px-4 py-3.5 text-center font-semibold text-[var(--kree-blue)]"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Espace pro
+                </Link>
+                <Link
+                  to="/signup"
+                  className="block rounded-2xl bg-[var(--kree-orange)] px-4 py-3.5 text-center font-semibold text-white"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Publier une annonce
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -212,9 +333,13 @@ export default function Navbar() {
 
 function ThreePanelMega({
   categories,
+  listPath,
+  listingBase,
   onNavigate,
 }: {
   categories: MegaCategory[];
+  listPath: string;
+  listingBase: string;
   onNavigate: () => void;
 }) {
   const [activeType, setActiveType] = useState<number | null>(null);
@@ -230,68 +355,70 @@ function ThreePanelMega({
     category && activeItem !== null ? category.items[activeItem] : null;
 
   return (
-    <div className="hidden border-t border-[var(--kree-blue)]/10 bg-white/98 shadow-[0_30px_60px_rgba(12,110,154,0.12)] backdrop-blur-xl lg:block">
-      <div
-        className={`mx-auto flex max-w-7xl px-4 sm:px-6 lg:px-8 ${
-          activeType === null
-            ? "justify-start"
-            : activeItem === null
-              ? ""
-              : ""
-        }`}
-      >
-        {/* Panel 1 — types */}
-        <div
-          className={`w-[16.5rem] shrink-0 py-4 pr-3 ${
-            activeType !== null ? "border-r border-[var(--kree-blue)]/8" : ""
-          }`}
-        >
-          <p className="mb-2 px-3 text-[11px] font-bold tracking-[0.14em] text-[var(--kree-orange)] uppercase">
-            Catégories
-          </p>
-          <ul className="space-y-0.5">
-            {categories.map((cat, index) => (
-              <li key={cat.label}>
-                <button
-                  type="button"
-                  onMouseEnter={() => {
-                    setActiveType(index);
-                    setActiveItem(null);
-                  }}
-                  onFocus={() => {
-                    setActiveType(index);
-                    setActiveItem(null);
-                  }}
-                  className={`flex w-full items-center justify-between rounded-2xl px-3 py-2.5 text-left transition ${
-                    activeType === index
-                      ? "bg-[var(--kree-blue-soft)] text-[var(--kree-blue)]"
-                      : "text-[var(--kree-ink)] hover:bg-[var(--kree-blue-soft)]/60"
-                  }`}
-                >
-                  <span>
-                    <span className="block text-sm font-semibold">{cat.label}</span>
-                    <span className="block text-xs text-[var(--kree-muted)]">{cat.desc}</span>
+    <div className="flex w-max max-w-[min(100vw-2rem,72rem)] overflow-hidden rounded-3xl border border-[var(--kree-blue)]/10 bg-white shadow-[0_24px_50px_rgba(12,110,154,0.18)]">
+      <div className="w-[16.5rem] shrink-0 p-4">
+        <p className="mb-2 px-3 text-[11px] font-bold tracking-[0.14em] text-[var(--kree-orange)] uppercase">
+          Catégories
+        </p>
+        <ul className="space-y-0.5">
+          {categories.map((cat, index) => (
+            <li key={cat.label}>
+              <button
+                type="button"
+                onMouseEnter={() => {
+                  setActiveType(index);
+                  setActiveItem(null);
+                }}
+                onFocus={() => {
+                  setActiveType(index);
+                  setActiveItem(null);
+                }}
+                className={`flex w-full items-center justify-between rounded-2xl px-3 py-2.5 text-left transition ${
+                  activeType === index
+                    ? "bg-[var(--kree-blue-soft)] text-[var(--kree-blue)]"
+                    : "text-[var(--kree-ink)] hover:bg-[var(--kree-blue-soft)]/60"
+                }`}
+              >
+                <span>
+                  <span className="block text-sm font-semibold">{cat.label}</span>
+                  <span className="block text-xs text-[var(--kree-muted)]">
+                    {cat.items.length > 0
+                      ? `${cat.items.length} annonce${cat.items.length > 1 ? "s" : ""}`
+                      : cat.desc}
                   </span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                    <path d="M9 6l6 6-6 6" />
-                  </svg>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+                </span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <path d="M9 6l6 6-6 6" />
+                </svg>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <Link
+          to={listPath}
+          onClick={onNavigate}
+          className="mt-3 inline-flex w-full items-center justify-center rounded-2xl bg-[var(--kree-blue)] px-3 py-2.5 text-sm font-semibold text-white transition hover:brightness-110"
+        >
+          Voir tout le catalogue →
+        </Link>
+      </div>
 
-        {/* Panel 2 — top 5 (appears on type hover) */}
-        {category && (
-          <div className="min-w-0 flex-1 animate-[kreeFadeUp_0.22s_ease] border-r border-[var(--kree-blue)]/8 py-4 px-4">
-            <p className="mb-2 px-2 text-[11px] font-bold tracking-[0.14em] text-[var(--kree-orange)] uppercase">
-              Top 5 · {category.label}
+      {category && (
+        <div className="w-[22rem] shrink-0 animate-[kreeFadeUp_0.22s_ease] border-l border-[var(--kree-blue)]/8 p-4">
+          <p className="mb-2 px-2 text-[11px] font-bold tracking-[0.14em] text-[var(--kree-orange)] uppercase">
+            Top · {category.label}
+          </p>
+          {category.items.length === 0 ? (
+            <p className="rounded-2xl bg-[var(--kree-blue-soft)] px-3 py-8 text-center text-sm text-[var(--kree-muted)]">
+              Aucune annonce dans cette catégorie pour le moment.
             </p>
+          ) : (
             <ul className="space-y-1">
               {category.items.map((item, index) => (
                 <li key={item.id}>
-                  <button
-                    type="button"
+                  <Link
+                    to={`${listingBase}/${item.id}`}
+                    onClick={onNavigate}
                     onMouseEnter={() => setActiveItem(index)}
                     onFocus={() => setActiveItem(index)}
                     className={`flex w-full items-center gap-3 rounded-2xl px-2 py-2 text-left transition ${
@@ -316,34 +443,39 @@ function ThreePanelMega({
                     <span className="shrink-0 text-xs font-bold text-[var(--kree-blue)]">
                       {item.price} TND
                     </span>
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
-        {/* Panel 3 — detail (appears on listing hover) */}
-        {preview && (
-          <div className="w-[22rem] shrink-0 animate-[kreeFadeUp_0.22s_ease] py-4 pl-4">
-            <PreviewCard item={preview} onNavigate={onNavigate} />
-          </div>
-        )}
-      </div>
+      {preview && (
+        <div className="w-[20rem] shrink-0 animate-[kreeFadeUp_0.22s_ease] border-l border-[var(--kree-blue)]/8 p-4">
+          <PreviewCard
+            item={preview}
+            href={`${listingBase}/${preview.id}`}
+            onNavigate={onNavigate}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
 function PreviewCard({
   item,
+  href,
   onNavigate,
 }: {
   item: MegaPreview;
+  href: string;
   onNavigate: () => void;
 }) {
   return (
-    <a
-      href="#"
+    <Link
+      to={href}
       onClick={onNavigate}
       className="group block h-full overflow-hidden rounded-[1.4rem] bg-[var(--kree-blue-soft)] ring-1 ring-[var(--kree-blue)]/10 transition hover:shadow-[0_16px_40px_rgba(12,110,154,0.15)]"
     >
@@ -373,32 +505,39 @@ function PreviewCard({
           Voir l’annonce →
         </span>
       </div>
-    </a>
+    </Link>
   );
 }
 
 function MobileGroup({
   title,
   items,
+  onNavigate,
 }: {
   title: string;
   items: MegaCategory[];
+  onNavigate?: () => void;
 }) {
   return (
-    <div className="mb-4">
+    <div className="mb-6">
       <p className="mb-2 text-xs font-bold tracking-[0.14em] text-[var(--kree-orange)] uppercase">
         {title}
       </p>
       <div className="grid gap-1">
         {items.map((item) => (
-          <a
+          <Link
             key={item.label}
-            href={item.href}
-            className="rounded-xl px-3 py-2.5 hover:bg-[var(--kree-blue-soft)]"
+            to={item.href}
+            onClick={onNavigate}
+            className="rounded-xl px-3 py-3 hover:bg-[var(--kree-blue-soft)]"
           >
             <div className="text-sm font-semibold text-[var(--kree-ink)]">{item.label}</div>
-            <div className="text-xs text-[var(--kree-muted)]">{item.desc}</div>
-          </a>
+            <div className="text-xs text-[var(--kree-muted)]">
+              {item.items.length > 0
+                ? `${item.items.length} annonce${item.items.length > 1 ? "s" : ""}`
+                : item.desc}
+            </div>
+          </Link>
         ))}
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { BrandLogo } from "@/components/shared/brand-logo";
 
 export default function Footer() {
   return (
@@ -27,12 +28,8 @@ export default function Footer() {
       <div className="relative mx-auto max-w-7xl px-4 pt-24 pb-8 sm:px-6 sm:pt-28 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
-            <Link to="/" className="inline-flex items-center gap-2.5">
-              <span className="relative flex size-10 items-center justify-center overflow-hidden rounded-2xl bg-[var(--kree-blue)] text-white">
-                <span className="font-display text-lg font-bold">K</span>
-                <span className="absolute -right-1 -bottom-1 size-4 rounded-full bg-[var(--kree-orange)]" />
-              </span>
-              <span className="font-display text-2xl font-bold">Kree</span>
+            <Link to="/" className="inline-flex items-center" aria-label="TunisRent — accueil">
+              <BrandLogo onDark className="h-16 sm:h-20" />
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/65">
               La plateforme tunisienne pour louer une maison, un véhicule, et trouver un
@@ -53,15 +50,25 @@ export default function Footer() {
 
           <FooterCol
             title="Explorer"
-            links={["Maisons", "Véhicules", "Déménageurs", "Offres week-end"]}
+            links={[
+              { label: "Maisons", href: "/maisons" },
+              { label: "Véhicules", href: "/vehicules" },
+              { label: "À propos", href: "/a-propos" },
+              { label: "Contact", href: "/contact" },
+            ]}
           />
           <FooterCol
             title="Aide"
-            links={["Centre d’aide", "Sécurité", "Conditions", "Confidentialité"]}
+            links={[
+              { label: "Centre d’aide", href: "/contact" },
+              { label: "Sécurité", href: "/contact" },
+              { label: "Conditions", href: "/contact" },
+              { label: "Confidentialité", href: "/contact" },
+            ]}
           />
           <div>
             <h4 className="mb-4 text-sm font-bold tracking-[0.14em] text-[var(--kree-orange)] uppercase">
-              Contact
+              Infos
             </h4>
             <ul className="space-y-3 text-sm text-white/70">
               <li>Tunis, Tunisie</li>
@@ -104,7 +111,13 @@ export default function Footer() {
   );
 }
 
-function FooterCol({ title, links }: { title: string; links: string[] }) {
+function FooterCol({
+  title,
+  links,
+}: {
+  title: string;
+  links: { label: string; href: string }[];
+}) {
   return (
     <div>
       <h4 className="mb-4 text-sm font-bold tracking-[0.14em] text-[var(--kree-orange)] uppercase">
@@ -112,9 +125,9 @@ function FooterCol({ title, links }: { title: string; links: string[] }) {
       </h4>
       <ul className="space-y-3 text-sm text-white/70">
         {links.map((link) => (
-          <li key={link}>
-            <a href="#" className="transition hover:text-white">
-              {link}
+          <li key={link.label}>
+            <a href={link.href} className="transition hover:text-white">
+              {link.label}
             </a>
           </li>
         ))}
